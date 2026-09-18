@@ -124,6 +124,52 @@ h1 {
   border: 1px solid #f8b4b4;
 }
 
+/* 刷新后正在重建快照会话的提示 */
+.banner.recovery {
+  display: block;
+  background: #e6f6ff;
+  color: #035388;
+  border: 1px solid #7fd4f5;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* “清除已保存会话”入口 */
+.session-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: -4px 0 16px;
+}
+
+.session-clear {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid #cbd2d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #3e4c59;
+  cursor: pointer;
+}
+
+.session-clear:hover {
+  border-color: #e02424;
+  color: #9b1c1c;
+}
+
+.session-clear:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
+.session-hint {
+  font-size: 12px;
+  color: #7b8794;
+}
+
 .banner .missing {
   font-size: 14px;
   font-weight: 400;

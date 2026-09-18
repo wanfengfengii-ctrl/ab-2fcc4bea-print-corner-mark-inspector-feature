@@ -78,6 +78,23 @@
 - 重新进行普通单图上传会替换基准并清除全部复检状态；复检流程不读取也不改写
   照明校准页面的任何状态。
 
+### 误刷新后的会话自动恢复
+
+- 工位核验常因浏览器误刷新中断。每次基准或复检分析成功后，页面把**原始 PNG 字节、
+  当前对比阶段（待复检 / 已完成对比）与选中方位**写入带结构标识与版本号的
+  IndexedDB 快照（`src/lib/sessionSnapshot.ts`）。判定结果、已采样像素与
+  照明校准状态均不纳入快照。
+- 页面重新加载时读取快照，并**重新走既有流水线**（PNG 签名校验 → 浏览器原生解码
+  `createImageBitmap` → Canvas 原始像素取样 → `analyzePixels` / `comparePixels`）
+  重建 `Analysis`、`ZoneResult` 与 32×32 差异图，不直接信任旧判定。恢复期间核验页
+  只显示「正在恢复」，成功后回到单图缺口审阅（待复检）或已完成的前后对比，
+  刷新前选中的方位及其审阅内容一并恢复，操作员无需重新选择两张原图。
+- 快照缺图、结构标识或版本不识别、PNG 损坏（重新解码失败）或浏览器存储不可用时，
+  页面明确说明无法恢复并清理该快照，随后允许正常上传；首次访问与禁用存储时的
+  既有核验流程不受阻（存储不可用时仅不保存会话）。
+- 操作员可随时点「清除已保存会话」删除快照并回到初始上传态；取消对比、普通上传
+  替换基准、普通上传失败也会同步删除或回退快照，刷新后不复活已丢弃的复检图。
+
 ## 本地启动
 
 ```bash
@@ -95,9 +112,9 @@ npm run preview
 ## 测试
 
 ```bash
-npm run test                          # Vitest：角标检测全部逻辑 + 复检对比（无变化/缺口修复/缺口转移/新增缺失逐区统计）+ 照明校准（均匀灰/单格暗角/整体偏色、亮度公式、固定格序、边界阈值）
+npm run test                          # Vitest：角标检测全部逻辑 + 复检对比（无变化/缺口修复/缺口转移/新增缺失逐区统计）+ 会话快照结构校验 + 照明校准（均匀灰/单格暗角/整体偏色、亮度公式、固定格序、边界阈值）
 npx playwright install chromium       # 首次运行端到端测试前安装浏览器
-npm run e2e                           # Playwright：角标核验全部验收 + 复检对比（固定不合格基准、上传改善图、32×32 差异图、失败阶段与保留基准、取消对比）+ 照明校准（通过报告、暗角热力图与结论、错误阶段提示、失败后重试、返回核验页状态保持）
+npm run e2e                           # Playwright：角标核验全部验收 + 复检对比（固定不合格基准、上传改善图、32×32 差异图、失败阶段与保留基准、取消对比）+ 误刷新会话恢复（819 基准恢复所选方位、满命中复检四类像素计数、损坏快照降级、清除后刷新无旧结果、禁用存储不受阻）+ 照明校准（通过报告、暗角热力图与结论、错误阶段提示、失败后重试、返回核验页状态保持）
 npm run verify                        # 依次运行以上全部
 ```
 
@@ -118,15 +135,18 @@ docker compose up --build --exit-code-from verify verify
 
 ```
 src/lib/detect.ts            角标检测核心（检测区、命中条件、阈值、缺口包围范围与四边计数、PNG 签名校验、复检对比纯函数 comparePixels/buildZoneDiffRgba）
+src/lib/sessionSnapshot.ts   误刷新会话快照（带结构版本的 IndexedDB 读写、快照完整性校验、存储不可用/损坏分类、串行化队列）
 src/lib/calibration.ts       照明校准领域对象 CalibrationReport 与纯计算（64 格均值、RGB 均值、极差、判定）
 src/lib/calibrationService.ts 异步分析服务（签名校验→原生解码→Canvas 取样→报告，失败带阶段标识）
-src/components/VerifyPage.tsx       套准角标核验页（保持挂载，切换工作台不丢失状态；基准固定/待复检/完成对比三阶段）
+src/components/VerifyPage.tsx       套准角标核验页（保持挂载，切换工作台不丢失状态；基准固定/待复检/完成对比三阶段；刷新后由快照原图重建，含正在恢复/无法恢复与清除已保存会话）
 src/components/CalibrationWorkbench.tsx 扫描照明校准工作台（四态、上传区、64 格热力图与摘要）
 src/App.tsx                  工作台切换外壳
 src/test/detect.test.ts      角标检测 Vitest 单元测试（含复检对比：无变化、缺口修复、缺口转移、新增缺失逐区统计）
+src/test/sessionSnapshot.test.ts 会话快照结构校验 Vitest 单元测试（缺图、未知版本/阶段/方位、PNG 签名损坏等）
 src/test/calibration.test.ts 照明校准 Vitest 单元测试（均匀灰/单格暗角/整体偏色）
 e2e/upload.spec.ts           角标核验 Playwright 端到端测试
 e2e/recheck.spec.ts          复检对比 Playwright 端到端测试（固定不合格基准→改善图→差异图→取消对比、失败阶段与保留基准、缺口转移）
+e2e/sessionRestore.spec.ts   误刷新会话恢复 Playwright 端到端测试（819 基准恢复方位、满命中复检四类像素计数、损坏/未知版本快照降级清理、清除后刷新无旧结果、禁用 IndexedDB 不受阻）
 e2e/calibration.spec.ts      照明校准 Playwright 端到端测试
 e2e/helpers/png.ts           最小 PNG 编码器（生成真实测试图，走浏览器原生解码）
 Dockerfile                   web（构建托管）与 verify（一次性验收）两个构建目标
