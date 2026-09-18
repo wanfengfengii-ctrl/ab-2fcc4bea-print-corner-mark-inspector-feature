@@ -89,6 +89,37 @@ h1 {
   font-size: 13px;
 }
 
+/* 刷新恢复提示：恢复期间给出明确状态，恢复失败沿用 error 横幅 */
+.banner.session-restore {
+  background: #e6f6ff;
+  color: #035388;
+  border: 1px solid #7fd4f5;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.clear-session {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid #cbd2d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #3e4c59;
+  cursor: pointer;
+}
+
+.clear-session:hover {
+  border-color: #c81e1e;
+  color: #c81e1e;
+}
+
+.clear-session:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
 .banner {
   display: flex;
   align-items: baseline;
