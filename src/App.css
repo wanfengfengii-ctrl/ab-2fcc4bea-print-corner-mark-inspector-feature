@@ -1,0 +1,666 @@
+:root {
+  font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #1f2933;
+  background: #f5f7fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* 工作台切换导航 */
+.workbench-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #d9e2ec;
+  padding-bottom: 12px;
+}
+
+.workbench-nav button {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border: 1px solid #cbd2d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #3e4c59;
+  cursor: pointer;
+}
+
+.workbench-nav button:hover {
+  border-color: #2f80ed;
+}
+
+.workbench-nav button:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
+.workbench-nav button.active {
+  background: #2f80ed;
+  border-color: #2f80ed;
+  color: #fff;
+}
+
+h1 {
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+
+.hint {
+  color: #52606d;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.upload label {
+  font-weight: 600;
+}
+
+.upload input[type='file'] {
+  /* 文件选择控件固有宽度较宽，窄屏下收缩到容器可用宽度，避免横向溢出 */
+  max-width: 100%;
+}
+
+.file-name {
+  color: #52606d;
+  font-size: 13px;
+}
+
+.banner {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.banner.error {
+  background: #fde8e8;
+  color: #c81e1e;
+  border: 1px solid #f8b4b4;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.banner.error strong {
+  font-weight: 700;
+}
+
+.banner.pass {
+  background: #def7ec;
+  color: #03543f;
+  border: 1px solid #84e1bc;
+}
+
+.banner.fail {
+  background: #fde8e8;
+  color: #9b1c1c;
+  border: 1px solid #f8b4b4;
+}
+
+.banner .missing {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.panels {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.preview {
+  position: relative;
+  width: min(100%, 480px);
+  border: 1px solid #d9e2ec;
+  background: #fff;
+  line-height: 0;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.zone-box {
+  position: absolute;
+  border: 2px solid;
+  cursor: pointer;
+  outline: none;
+}
+
+.zone-box:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
+.zone-box.selected {
+  border-width: 3px;
+  background: rgba(47, 128, 237, 0.12);
+}
+
+.zone-box.present {
+  border-color: #0e9f6e;
+  box-shadow: 0 0 0 1px rgba(14, 159, 110, 0.4);
+}
+
+.zone-box.absent {
+  border-color: #e02424;
+  box-shadow: 0 0 0 1px rgba(224, 36, 36, 0.4);
+}
+
+.zone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  flex: 1;
+  /* 窄屏（如 280px 宽页面）下收缩到容器可用宽度，不引发横向溢出 */
+  min-width: min(260px, 100%);
+}
+
+.zone-card {
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+.zone-card:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
+.zone-card.selected {
+  border-color: #2f80ed;
+  box-shadow: 0 0 0 1px rgba(47, 128, 237, 0.5);
+}
+
+.zone-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.zone-label {
+  font-weight: 700;
+}
+
+.zone-status {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.zone-card.present .zone-status {
+  background: #def7ec;
+  color: #03543f;
+}
+
+.zone-card.absent {
+  border-color: #f8b4b4;
+}
+
+.zone-card.absent .zone-status {
+  background: #fde8e8;
+  color: #c81e1e;
+}
+
+.zone-hits {
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+}
+
+.zone-reason {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #c81e1e;
+}
+
+.zone-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #7b8794;
+}
+
+.review {
+  margin-top: 20px;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+}
+
+/* 键盘打开证据后焦点移入审阅区，给出可见焦点指示 */
+.review:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
+.review h2 {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.review-body {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.review-crop-wrap {
+  margin: 0;
+  /* 裁片目标宽度 256px；窄屏时随审阅容器收缩，避免横向溢出 */
+  width: 256px;
+  max-width: 100%;
+}
+
+.review-crop {
+  display: block;
+  width: 100%;
+  /* 高度跟随画布固有比例（32×32），保持正方形不变形 */
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 1px solid #d9e2ec;
+  background: #fff;
+}
+
+.review-crop-wrap figcaption {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #52606d;
+  line-height: 1.6;
+}
+
+.review-detail {
+  flex: 1;
+  min-width: min(260px, 100%);
+}
+
+.review-bounds {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.edge-counts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* 轨道可收缩到内容以下，窄屏不撑破审阅容器 */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+.edge-counts li {
+  background: #f5f7fa;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+/* ===== 复检前后对比 ===== */
+
+.verdict-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.verdict-row .banner {
+  margin-bottom: 0;
+}
+
+.verdict-tag {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.recheck-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border: 1px dashed #7fd4f5;
+  border-radius: 8px;
+  background: #f0f9ff;
+}
+
+.recheck-bar .recheck-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.recheck-bar input[type='file'] {
+  max-width: 100%;
+}
+
+.recheck-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #035388;
+  background: #e6f6ff;
+  border: 1px solid #7fd4f5;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.recheck-status.done {
+  background: #def7ec;
+  border-color: #84e1bc;
+  color: #03543f;
+}
+
+.recheck-cancel {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: 1px solid #cbd2d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #3e4c59;
+  cursor: pointer;
+}
+
+.recheck-cancel:hover {
+  border-color: #2f80ed;
+}
+
+.recheck-cancel:focus-visible {
+  outline: 2px solid #2f80ed;
+  outline-offset: 2px;
+}
+
+/* 预览图左上角信息标签：标明该预览为调整前基准还是复检结果 */
+.preview-tag {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(31, 41, 51, 0.82);
+  color: #fff;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.preview-recheck .preview-tag {
+  background: rgba(3, 83, 136, 0.88);
+}
+
+/* 基准图与叠加框单独包一层定位容器：复检预览出现后叠加框仍相对基准图定位 */
+.preview-baseline {
+  position: relative;
+  line-height: 0;
+}
+
+/* 复检预览叠在基准预览下方，宽高与基准一致（line-height: 0 去除间隙） */
+.preview-recheck {
+  position: relative;
+  border-top: 2px dashed #cbd2d9;
+  margin-top: 2px;
+  line-height: 0;
+}
+
+.preview-recheck img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.zone-diff {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #d9e2ec;
+}
+
+/* 复检判定行：复检存在/缺失徽标与命中增减并排，明确区分两次方位判定 */
+.zone-recheck-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.zone-status.is-present {
+  background: #def7ec;
+  color: #03543f;
+}
+
+.zone-status.is-absent {
+  background: #fde8e8;
+  color: #c81e1e;
+}
+
+.diff-delta {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #52606d;
+}
+
+.diff-delta.up {
+  color: #03543f;
+}
+
+.diff-delta.down {
+  color: #c81e1e;
+}
+
+.diff-counts {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 8px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #3e4c59;
+}
+
+.diff-legend {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  font-size: 12px;
+  color: #3e4c59;
+}
+
+.diff-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.diff-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #d9e2ec;
+  border-radius: 3px;
+  flex: none;
+}
+
+.diff-swatch.same-hit {
+  background: rgb(255, 0, 255);
+}
+
+.diff-swatch.same-miss {
+  background: rgb(255, 255, 255);
+}
+
+.diff-swatch.recovered {
+  background: rgb(16, 185, 129);
+}
+
+.diff-swatch.new-gap {
+  background: rgb(224, 36, 36);
+}
+
+/* ===== 扫描照明校准工作台 ===== */
+
+.cal-status {
+  font-weight: 600;
+  font-size: 13px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e4e7eb;
+  color: #3e4c59;
+}
+
+.cal-progress {
+  font-size: 14px;
+  font-weight: 400;
+  background: #e6f6ff;
+  color: #035388;
+  border: 1px solid #7fd4f5;
+}
+
+.cal-entry {
+  border: 1px dashed #cbd2d9;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  color: #52606d;
+  background: #fff;
+}
+
+.cal-summary {
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.cal-summary h2,
+.cal-heatmap-wrap h2 {
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.cal-metrics {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+.cal-metrics li {
+  background: #f5f7fa;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.cal-failures {
+  margin: 8px 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #9b1c1c;
+}
+
+.cal-conclusion {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1f2933;
+}
+
+.cal-heatmap-wrap {
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fff;
+}
+
+.cal-heatmap {
+  display: grid;
+  gap: 2px;
+  /* 默认列数由组件内联指定；容器不超过内容宽度且窄屏可收缩 */
+  width: min(100%, 560px);
+}
+
+.cal-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  /* 长数字在窄格内不撑破网格 */
+  min-width: 0;
+}
+
+.cal-cell-index {
+  font-size: 10px;
+  opacity: 0.75;
+}
+
+.cal-cell-luma {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}

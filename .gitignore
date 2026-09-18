@@ -1,0 +1,9 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.local
+.DS_Store
+# 本机环境辅助目录（非项目文件）
+.npm-cache/
+.syslibs/
